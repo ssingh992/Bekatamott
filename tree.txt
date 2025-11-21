@@ -1,0 +1,285 @@
+├───.vscode
+│       settings.json
+│
+└───bishram-ekata-mandali fixed
+    │   ecosystem.config.cjs
+    │   README.md
+    │
+    ├───backend
+    │   │   .env
+    │   │   package.json
+    │   │   tsconfig.json
+    │   │
+    │   ├───prisma
+    │   │   │   schema.prisma
+    │   │   │
+    │   │   └───migrations
+    │   │       │   migration_lock.toml
+    │   │       │
+    │   │       └───20250801082941_init
+    │   │               migration.sql
+    │   │
+    │   └───src
+    │       │   db.ts
+    │       │   index.ts
+    │       │
+    │       ├───api
+    │       │       aboutSections.ts
+    │       │       aiTools.ts
+    │       │       auth.ts
+    │       │       blogPosts.ts
+    │       │       branchChurches.ts
+    │       │       chatbot.ts
+    │       │       collectionRecords.ts
+    │       │       comments.ts
+    │       │       contactMessages.ts
+    │       │       donationRecords.ts
+    │       │       events.ts
+    │       │       friendships.ts
+    │       │       groups.ts
+    │       │       historyChapters.ts
+    │       │       historyMilestones.ts
+    │       │       homeSlides.ts
+    │       │       interactions.ts
+    │       │       keyPersons.ts
+    │       │       ministries.ts
+    │       │       ministryJoinRequests.ts
+    │       │       newsItems.ts
+    │       │       prayerRequests.ts
+    │       │       sermons.ts
+    │       │       testimonials.ts
+    │       │       users.ts
+    │       │
+    │       └───services
+    │               emailService.ts
+    │
+    └───frontend
+        │   .env
+        │   .gitignore
+        │   google9cc376789214cae9.html
+        │   index.html
+        │   manifest.json
+        │   metadata.json
+        │   package.json
+        │   postcss.config.js
+        │   sw.js
+        │   tailwind.config.js
+        │   tsconfig.json
+        │   vite.config.ts
+        │
+        ├───public
+        │   │   google9cc376789214cae9.html
+        │   │   manifest.json
+        │   │   sw.js
+        │   │
+        │   └───icons
+        │           brand.svg
+        │
+        └───src
+            │   App.tsx
+            │   dateConverter.ts
+            │   index.css
+            │   index.tsx
+            │   metadata.json
+            │   tsconfig.json
+            │   types.ts
+            │   vite.config.ts
+            │
+            ├───components
+            │   ├───admin
+            │   │       AdminDashboardPage.tsx
+            │   │       AdminDeleteModal.tsx
+            │   │       AdvancedMediaUploader.tsx
+            │   │       BSCalendarPicker.tsx
+            │   │       ContentFormModal.tsx
+            │   │       EditScheduleDraftModal.tsx
+            │   │       PrintableSchedulePDF.ts
+            │   │       SelectMediaModal.tsx
+            │   │       ViewGeneratedScheduleModal.tsx
+            │   │       ViewRosterItemModal.tsx
+            │   │
+            │   ├───ads
+            │   │       AdSlot.tsx
+            │   │
+            │   ├───auth
+            │   │       AuthModal.tsx
+            │   │       ChangePasswordForm.tsx
+            │   │       ForgotPasswordForm.tsx
+            │   │       LoginForm.tsx
+            │   │       NotificationSettings.tsx
+            │   │       PrivacySettings.tsx
+            │   │       ProfileEditModal.tsx
+            │   │       ProtectedRoute.tsx
+            │   │       RegisterForm.tsx
+            │   │       ResetPasswordForm.tsx
+            │   │       SocialLoginButtons.tsx
+            │   │
+            │   ├───blog
+            │   │       BlogPostCard.tsx
+            │   │
+            │   ├───calendar
+            │   │       InteractiveCalendar.tsx
+            │   │       MonthImageDisplay.tsx
+            │   │       PrintableCalendarPDF.ts
+            │   │
+            │   ├───calls
+            │   │       CallModal.tsx
+            │   │
+            │   ├───chat
+            │   │       ChatMessageBubble.tsx
+            │   │
+            │   ├───chatbot
+            │   │       ChatbotFab.tsx
+            │   │       ChatbotPanel.tsx
+            │   │
+            │   ├───comments
+            │   │       CommentItem.tsx
+            │   │
+            │   ├───community
+            │   │       ContactListItem.tsx
+            │   │       CreateGroupModal.tsx
+            │   │       GroupListItem.tsx
+            │   │
+            │   ├───events
+            │   │       EventCard.tsx
+            │   │       FeaturedEventDisplay.tsx
+            │   │
+            │   ├───history
+            │   │       ChapterActions.tsx
+            │   │       PrintableChapterPDF.ts
+            │   │
+            │   ├───home
+            │   │       CreatePostWidget.tsx
+            │   │       FeatureCard.tsx
+            │   │       HeroSection.tsx
+            │   │       HeroSlider.tsx
+            │   │       
+            │   ├───icons
+            │   │       ChatBotHeadIcon.tsx
+            │   │       GenericIcons.tsx
+            │   │
+            │   ├───layout
+            │   │       ConnectWithUs.tsx
+            │   │       Footer.tsx
+            │   │       Header.tsx
+            │   │       RightSidebar.tsx
+            │   │       Sidebar.tsx
+            │   │
+            │   ├───news
+            │   │       NewsItemCard.tsx
+            │   │
+            │   ├───notifications
+            │   │       NotificationIcon.tsx
+            │   │       NotificationPanel.tsx
+            │   │
+            │   ├───post
+            │   │       CreatePostModal.tsx
+            │   │       PostMediaDisplay.tsx
+            │   │
+            │   ├───prayer
+            │   │       PrayerRequestCard.tsx
+            │   │       SubmitPrayerRequestModal.tsx
+            │   │       TestimonialCard.tsx
+            │   │
+            │   ├───search
+            │   │       GlobalSearchModal.tsx
+            │   │
+            │   ├───sermons
+            │   │       SermonCard.tsx
+            │   │
+            │   ├───sidebar
+            │   │       SidebarContentCard.tsx
+            │   │
+            │   └───ui
+            │           Button.tsx
+            │           Card.tsx
+            │           CommentModal.tsx
+            │           LanguageSwitcher.tsx
+            │           LoadingSpinner.tsx
+            │           MediaViewerModal.tsx
+            │           Modal.tsx
+            │           RichTextEditor.tsx
+            │           ShareModal.tsx
+            │           SocialIcons.tsx
+            │
+            ├───contexts
+            │       AuthContext.tsx
+            │       ContentContext.tsx
+            │       FontSizeContext.tsx
+            │       NotificationContext.tsx
+            │       ThemeContext.tsx
+            │
+            ├───hooks
+            │       useAITranslate.tsx
+            │       useInteractionHandlers.ts
+            │
+            ├───pages
+            │   │   AboutPage.tsx
+            │   │   App.tsx
+            │   │   BlogPage.tsx
+            │   │   BranchesPage.tsx
+            │   │   ChatPage.tsx
+            │   │   ChurchHistoryPage.tsx
+            │   │   CommunityPage.tsx
+            │   │   ContactPage.tsx
+            │   │   DonatePage.tsx
+            │   │   EventCalendarPage.tsx
+            │   │   EventsPage.tsx
+            │   │   FellowshipProgramDetailPage.tsx
+            │   │   HomePage.tsx
+            │   │   ManageBlogPostsPage.tsx
+            │   │   MediaPage.tsx
+            │   │   MinistriesPage.tsx
+            │   │   NewsPage.tsx
+            │   │   NotificationsPage.tsx
+            │   │   PastEventsArchivePage.tsx
+            │   │   PrayerRequestsPage.tsx
+            │   │   ProfilePage.tsx
+            │   │   PublicProfilePage.tsx
+            │   │   ResetPasswordPage.tsx
+            │   │   SermonsPage.tsx
+            │   │   SingleBlogPostPage.tsx
+            │   │   SingleEventPage.tsx
+            │   │   SingleMinistryPage.tsx
+            │   │   SingleNewsPage.tsx
+            │   │   SingleSermonPage.tsx
+            │   │   TimelinePage.tsx
+            │   │
+            │   └───admin
+            │           AdminActivityLogPage.tsx
+            │           AdminDashboardOverview.tsx
+            │           AdminDashboardPage.tsx
+            │           FinancialSummaryPage.tsx
+            │           ManageAboutSectionsPage.tsx
+            │           ManageAdvertisementsPage.tsx
+            │           ManageBlogPostsPage.tsx
+            │           ManageBranchChurchesPage.tsx
+            │           ManageChurchHistoryPage.tsx
+            │           ManageChurchMembersPage.tsx
+            │           ManageCollectionRecordsPage.tsx
+            │           ManageContactMessagesPage.tsx
+            │           ManageContentPage.tsx
+            │           ManageDecisionsPage.tsx
+            │           ManageDirectMediaPage.tsx
+            │           ManageDonatePage.tsx
+            │           ManageDonationsPage.tsx
+            │           ManageEventRsvpsPage.tsx
+            │           ManageEventsPage.tsx
+            │           ManageExpensesPage.tsx
+            │           ManageFellowshipSchedulesPage.tsx
+            │           ManageHistoryPage.tsx
+            │           ManageHomeSlidesPage.tsx
+            │           ManageKeyPersonsPage.tsx
+            │           ManageMeetingsPage.tsx
+            │           ManageMinistriesPage.tsx
+            │           ManageMinistryJoinRequestsPage.tsx
+            │           ManageMonthlyThemeImagesPage.tsx
+            │           ManageNewsPage.tsx
+            │           ManagePrayerRequestsPage.tsx
+            │           ManageSermonsPage.tsx
+            │           ManageTestimonialsPage.tsx
+            │           ManageUsersPage.tsx
+            │           SeoToolsPage.tsx
+            │
+            └───utils
+                    adminExportUtils.ts
