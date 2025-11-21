@@ -1,0 +1,4 @@
+# NEVER COMMIT ENV FILES
+backend/.env
+frontend/.env
+*.env
