@@ -1,4 +1,5 @@
 
+import crypto from 'crypto';
 import express from 'express';
 import { prisma } from '../db';
 import { Prisma, newsitem } from '@prisma/client';
@@ -33,12 +34,13 @@ router.post('/', async (req, res) => {
     const itemDate = date && !isNaN(new Date(date).getTime()) ? new Date(date) : new Date();
     const postedByOwnerId = '0';
     const postedByOwnerName = 'Admin System';
+    const id = crypto.randomUUID();
 
     try {
         const newItem = await prisma.newsitem.create({
             data: {
-                id: crypto.randomUUID(), // REQUIRED in your schema
-    updatedAt: new Date(),   // REQUIRED
+                id, // REQUIRED in your schema
+                updatedAt: new Date(),   // REQUIRED
                 title,
                 description,
                 date: itemDate,
@@ -46,6 +48,7 @@ router.post('/', async (req, res) => {
                 imageUrl,
                 videoUrl,
                 audioUrl,
+                linkPath: `/news/${id}`,
                 postedByOwnerId,
                 postedByOwnerName,
             }

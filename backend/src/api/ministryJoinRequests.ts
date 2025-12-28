@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import express from 'express';
 import { prisma } from '../db';
 import { Prisma } from '@prisma/client';
@@ -27,13 +28,14 @@ router.post('/', async (req, res) => {
     try {
         const newRequest = await prisma.ministryjoinrequest.create({
             data: {
+                id: crypto.randomUUID(),
                 userId,
                 userName,
                 userEmail,
                 ministryId,
                 ministryName,
-                message,
-                ministryGuidelines,
+                message: message || '',
+                ministryGuidelines: ministryGuidelines || '',
                 status: 'pending',
             }
         });

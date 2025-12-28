@@ -1,10 +1,39 @@
+import crypto from "crypto";
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { prisma } from "../db";
 import { authMiddleware } from "../middleware/auth";
 
+const ADMIN_EMAIL = "bishramekatamandali@gmail.com";
+const ADMIN_PASSWORD = "bishramekatamandali@15Done";
+
 const router = express.Router();
+
+async function ensureDefaultAdmin() {
+  try {
+    const existingAdmin = await prisma.user.findUnique({ where: { email: ADMIN_EMAIL } });
+
+    if (!existingAdmin) {
+      const hashed = await bcrypt.hash(ADMIN_PASSWORD, 10);
+      await prisma.user.create({
+        data: {
+          id: crypto.randomUUID(),
+          fullName: "Bishram Admin",
+          email: ADMIN_EMAIL,
+          username: ADMIN_EMAIL.split("@")[0],
+          role: "admin",
+          password: hashed as any,
+        },
+      });
+      console.log("✅ Default admin account created for", ADMIN_EMAIL);
+    }
+  } catch (error) {
+    console.error("❌ Failed to ensure default admin exists:", error);
+  }
+}
+
+ensureDefaultAdmin();
 
 /* ---------------------------------------------
    Helper: create JWT token
@@ -33,20 +62,22 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "Missing fields" });
     }
 
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const normalizedEmail = email.toLowerCase();
+    const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (existing) {
       return res.status(400).json({ error: "Email already exists" });
     }
 
     const hashed = await bcrypt.hash(password, 10);
+    const role = normalizedEmail === ADMIN_EMAIL ? "admin" : "user";
 
     const user = await prisma.user.create({
       data: {
         id: crypto.randomUUID(),
         fullName,
-        email,
+        email: normalizedEmail,
         username: email.split("@")[0],
-        role: "user",
+        role,
         // Store hashed password in new field
         // Must add password column in schema if missing
         password: hashed as any,
@@ -68,10 +99,12 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    const normalizedEmail = email.toLowerCase();
+
     if (!email || !password)
       return res.status(400).json({ error: "Missing email or password" });
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
 
     if (!user || !user.password)
       return res.status(401).json({ error: "Invalid credentials" });
