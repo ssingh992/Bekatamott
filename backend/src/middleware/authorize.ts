@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import prisma from "../db";
+import { prisma } from "../db";
 
-export const authorizeAdmin = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
+type RequestWithUser = Request & { user?: { id: string; role: string } };
 
-  const user = await prisma.user.findUnique({ where: { id: req.userId } });
+export const authorizeAdmin = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  if (!req.user?.id) return res.status(401).json({ error: "Unauthorized" });
+
+  const user = await prisma.user.findUnique({ where: { id: req.user.id } });
   if (!user || (user.role !== "admin" && user.role !== "owner")) {
     return res.status(403).json({ error: "Admin privileges required" });
   }
@@ -12,10 +14,10 @@ export const authorizeAdmin = async (req: Request, res: Response, next: NextFunc
   next();
 };
 
-export const authorizeOwner = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
+export const authorizeOwner = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  if (!req.user?.id) return res.status(401).json({ error: "Unauthorized" });
 
-  const user = await prisma.user.findUnique({ where: { id: req.userId } });
+  const user = await prisma.user.findUnique({ where: { id: req.user.id } });
   if (!user || user.role !== "owner") {
     return res.status(403).json({ error: "Owner privileges required" });
   }

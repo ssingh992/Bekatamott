@@ -1,4 +1,5 @@
 
+import crypto from 'crypto';
 import express from 'express';
 import { prisma } from '../db';
 import { Prisma, sermon } from '@prisma/client';
@@ -57,11 +58,12 @@ router.post('/', async (req, res) => {
 
     // Validate date before creating a Date object. Pass null if date is invalid or not provided.
     const sermonDate = date && !isNaN(new Date(date).getTime()) ? new Date(date) : null;
+    const id = crypto.randomUUID();
     
     try {
         const newSermon = await prisma.sermon.create({
             data: {
-                id: crypto.randomUUID(), // REQUIRED in your schema
+                id, // REQUIRED in your schema
                 updatedAt: new Date(),   // REQUIRED
                 title,
                 description,
@@ -73,6 +75,7 @@ router.post('/', async (req, res) => {
                 audioUrl,
                 fullContent,
                 imageUrl,
+                linkPath: `/sermons/${id}`,
                 postedByOwnerId,
                 postedByOwnerName,
             }
