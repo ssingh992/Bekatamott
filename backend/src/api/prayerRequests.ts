@@ -2,8 +2,18 @@
 import express from 'express';
 import { prisma } from '../db';
 import { Prisma, prayerrequest, prayerrequest_visibility, prayerrequest_status } from '@prisma/client';
+import { authMiddleware } from '../middleware/auth';
 
 const router = express.Router();
+
+const ensureAdmin = (req: express.Request, res: express.Response): boolean => {
+    const user = (req as any).user;
+    if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
+        res.status(403).json({ error: 'Only administrators can perform this action.' });
+        return false;
+    }
+    return true;
+};
 
 const shapePrayerRequestForFrontend = (pr: prayerrequest & { prayers?: any[], _count?: { prayers: number } }): any => {
     const { _count, ...rest } = pr;
@@ -36,8 +46,9 @@ router.get('/', async (req, res) => {
     }
 });
 
-// POST a new prayer request
-router.post('/', async (req, res) => {
+// POST a new prayer request (admin only)
+router.post('/', authMiddleware, async (req, res) => {
+    if (!ensureAdmin(req, res)) return;
     const { title, requestText, visibility, category, mediaUrls, location, taggedFriends, feelingActivity, backgroundTheme, postedByOwnerId, postedByOwnerName, userProfileImageUrl, userName, userId } = req.body;
 
     try {
@@ -68,8 +79,9 @@ router.post('/', async (req, res) => {
     }
 });
 
-// PUT (update) status of a prayer request
-router.put('/:id/status', async (req, res) => {
+// PUT (update) status of a prayer request (admin only)
+router.put('/:id/status', authMiddleware, async (req, res) => {
+    if (!ensureAdmin(req, res)) return;
     const { id } = req.params;
     const { status, adminNotes } = req.body;
 
@@ -155,8 +167,9 @@ router.post('/:id/toggle-prayer', async (req, res) => {
 });
 
 
-// DELETE a prayer request
-router.delete('/:id', async (req, res) => {
+// DELETE a prayer request (admin only)
+router.delete('/:id', authMiddleware, async (req, res) => {
+    if (!ensureAdmin(req, res)) return;
     const { id } = req.params;
     try {
         // Prisma's onDelete: Cascade will handle deleting related comments and prayers

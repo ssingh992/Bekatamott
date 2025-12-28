@@ -20,7 +20,7 @@ const getSortDate = (item: any): Date => {
 
 const PrayerRequestsPage: React.FC = () => {
     const { prayerRequests, testimonials, loadingContent, togglePrayerOnRequest, updatePrayerRequestStatusByUser, addCommentToItem } = useContent();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isAdmin } = useAuth();
   
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [createModalInitialType, setCreateModalInitialType] = useState<'prayer' | 'testimonial'>('prayer');
@@ -52,6 +52,7 @@ const PrayerRequestsPage: React.FC = () => {
     }, [prayerRequests, testimonials, loadingContent]);
 
     const openCreateModal = (type: 'prayer' | 'testimonial') => {
+        if (!isAdmin) return;
         if (isAuthenticated) {
             setCreateModalInitialType(type);
             setIsCreateModalOpen(true);
@@ -85,7 +86,7 @@ const PrayerRequestsPage: React.FC = () => {
     return (
         <div className="min-h-full">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <CreatePostWidget onTriggerCreate={openCreateModal} />
+                {isAdmin && <CreatePostWidget onTriggerCreate={openCreateModal} />}
                 
                  <Section title="Community Prayers & Testimonies">
                     {loadingContent ? (
@@ -109,13 +110,13 @@ const PrayerRequestsPage: React.FC = () => {
                         ))}
                         </div>
                     ) : (
-                        <p className="text-center text-slate-500 py-10">No public prayer requests or testimonies yet. Be the first to share!</p>
+                        <p className="text-center text-slate-500 py-10">No public prayer requests or testimonies are available right now.</p>
                     )}
                 </Section>
             </div>
 
             <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-            {isCreateModalOpen && (
+            {isAdmin && isCreateModalOpen && (
                 <CreatePostModal
                     isOpen={isCreateModalOpen}
                     onClose={() => setIsCreateModalOpen(false)}
