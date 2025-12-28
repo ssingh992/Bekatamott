@@ -85,7 +85,7 @@ const saveStoredData = <T,>(key: string, data: T) => {
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
 export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, isAdmin } = useAuth();
   const { addNotification } = useNotification();
 
   const [sermons, setSermons] = useState<Sermon[]>([]);
@@ -173,11 +173,15 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
   }, [currentUser]);
 
   const addContent = async (type: ContentType, data: GenericContentFormData): Promise<{ success: boolean; newItem?: ContentItem; message?: string }> => {
+    const allowedForNonAdmins: ContentType[] = ['contactMessage', 'ministryJoinRequest'];
+    if (!isAdmin && !allowedForNonAdmins.includes(type)) {
+        return { success: false, message: 'Only administrators can create this type of content.' };
+    }
     const contentTypeToEndpoint: Partial<Record<ContentType, string>> = {
         sermon: 'sermons', event: 'events', ministry: 'ministries', blogPost: 'blogposts', news: 'newsitems', homeSlide: 'homeslides',
         aboutSection: 'aboutsections', keyPerson: 'keypersons', historyMilestone: 'historymilestones', historyChapter: 'historychapters',
         branchChurch: 'branchchurches', prayerRequest: 'prayer-requests', testimonial: 'testimonials', donation: 'donation-records',
-        collectionRecord: 'collection-records', ministryJoinRequest: 'ministry-join-requests'
+        collectionRecord: 'collection-records', ministryJoinRequest: 'ministry-join-requests', contactMessage: 'contact-messages'
     };
     const endpoint = contentTypeToEndpoint[type];
     if (endpoint) {
@@ -213,7 +217,7 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   const updateContent = async (type: ContentType, id: string, data: GenericContentFormData): Promise<{ success: boolean; updatedItem?: ContentItem; message?: string }> => {
-    const contentTypeToEndpoint: Partial<Record<ContentType, string>> = { sermon: 'sermons', event: 'events', ministry: 'ministries', blogPost: 'blogposts', news: 'newsitems', homeSlide: 'homeslides', aboutSection: 'aboutsections', keyPerson: 'keypersons', historyMilestone: 'historymilestones', historyChapter: 'historychapters', branchChurch: 'branchchurches', prayerRequest: 'prayer-requests', testimonial: 'testimonials', donation: 'donation-records', collectionRecord: 'collection-records' };
+    const contentTypeToEndpoint: Partial<Record<ContentType, string>> = { sermon: 'sermons', event: 'events', ministry: 'ministries', blogPost: 'blogposts', news: 'newsitems', homeSlide: 'homeslides', aboutSection: 'aboutsections', keyPerson: 'keypersons', historyMilestone: 'historymilestones', historyChapter: 'historychapters', branchChurch: 'branchchurches', prayerRequest: 'prayer-requests', testimonial: 'testimonials', donation: 'donation-records', collectionRecord: 'collection-records', contactMessage: 'contact-messages', ministryJoinRequest: 'ministry-join-requests' };
     const endpoint = contentTypeToEndpoint[type];
     if (endpoint) {
         try {
@@ -258,7 +262,7 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
   }
 
   const deleteContent = async (type: ContentType, id: string): Promise<boolean> => {
-    const contentTypeToEndpoint: Partial<Record<ContentType, string>> = { sermon: 'sermons', event: 'events', ministry: 'ministries', blogPost: 'blogposts', news: 'newsitems', homeSlide: 'homeslides', aboutSection: 'aboutsections', keyPerson: 'keypersons', historyMilestone: 'historymilestones', historyChapter: 'historychapters', branchChurch: 'branchchurches', prayerRequest: 'prayer-requests', testimonial: 'testimonials', donation: 'donation-records', collectionRecord: 'collection-records', ministryJoinRequest: 'ministry-join-requests' };
+    const contentTypeToEndpoint: Partial<Record<ContentType, string>> = { sermon: 'sermons', event: 'events', ministry: 'ministries', blogPost: 'blogposts', news: 'newsitems', homeSlide: 'homeslides', aboutSection: 'aboutsections', keyPerson: 'keypersons', historyMilestone: 'historymilestones', historyChapter: 'historychapters', branchChurch: 'branchchurches', prayerRequest: 'prayer-requests', testimonial: 'testimonials', donation: 'donation-records', collectionRecord: 'collection-records', ministryJoinRequest: 'ministry-join-requests', contactMessage: 'contact-messages' };
     const endpoint = contentTypeToEndpoint[type];
     if (endpoint) {
         try {

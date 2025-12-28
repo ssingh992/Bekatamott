@@ -2,8 +2,18 @@
 import express from 'express';
 import { prisma } from '../db';
 import { Prisma, testimonial, testimonial_visibility } from '@prisma/client';
+import { authMiddleware } from '../middleware/auth';
 
 const router = express.Router();
+
+const ensureAdmin = (req: express.Request, res: express.Response): boolean => {
+    const user = (req as any).user;
+    if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
+        res.status(403).json({ error: 'Only administrators can perform this action.' });
+        return false;
+    }
+    return true;
+};
 
 const shapeTestimonialForFrontend = (testimonial: testimonial): any => ({
     ...testimonial,
@@ -26,8 +36,9 @@ router.get('/', async (req, res) => {
     }
 });
 
-// POST a new testimonial
-router.post('/', async (req, res) => {
+// POST a new testimonial (admin only)
+router.post('/', authMiddleware, async (req, res) => {
+    if (!ensureAdmin(req, res)) return;
     const { title, contentText, visibility, mediaUrls, location, taggedFriends, feelingActivity, backgroundTheme, postedByOwnerId, postedByOwnerName, userId, userName, userProfileImageUrl } = req.body;
 
     try {
@@ -56,8 +67,9 @@ router.post('/', async (req, res) => {
     }
 });
 
-// PUT (update) a testimonial - Optional, as users typically don't edit them
-router.put('/:id', async (req, res) => {
+// PUT (update) a testimonial - admin only
+router.put('/:id', authMiddleware, async (req, res) => {
+    if (!ensureAdmin(req, res)) return;
     const { id } = req.params;
     const { title, contentText, visibility } = req.body;
     
@@ -80,8 +92,9 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// DELETE a testimonial
-router.delete('/:id', async (req, res) => {
+// DELETE a testimonial - admin only
+router.delete('/:id', authMiddleware, async (req, res) => {
+    if (!ensureAdmin(req, res)) return;
     const { id } = req.params;
     try {
         await prisma.testimonial.delete({ where: { id } });

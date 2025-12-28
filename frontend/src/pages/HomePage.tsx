@@ -27,7 +27,7 @@ const HomePage: React.FC = () => {
     togglePrayerOnRequest, updatePrayerRequestStatusByUser, addCommentToItem
   } = useContent();
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -97,9 +97,10 @@ const HomePage: React.FC = () => {
   };
   
   const openCreateModal = (type: 'prayer' | 'testimonial') => {
+    if (!isAdmin) return;
     if (isAuthenticated) {
-        setCreateModalInitialType(type);
-        setIsCreateModalOpen(true);
+      setCreateModalInitialType(type);
+      setIsCreateModalOpen(true);
     } else {
         setIsAuthModalOpen(true);
     }
@@ -132,7 +133,7 @@ const HomePage: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <AdSlot placementKey="homepage_banner_top" className="my-8" />
         
-        <CreatePostWidget onTriggerCreate={openCreateModal} />
+        {isAdmin && <CreatePostWidget onTriggerCreate={openCreateModal} />}
         
         {!loadingContent && (
           <>
@@ -181,7 +182,7 @@ const HomePage: React.FC = () => {
       </div>
 
        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-        {isCreateModalOpen && (
+        {isAdmin && isCreateModalOpen && (
             <CreatePostModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
