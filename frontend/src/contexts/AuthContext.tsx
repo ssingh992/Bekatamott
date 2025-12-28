@@ -18,7 +18,9 @@ import {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE_URL = "http://localhost:3001/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ||
+  "http://localhost:3001/api";
 
 const AUTH_TOKEN_KEY = "bem_auth_token";
 const CURRENT_USER_KEY = "bem_current_user";
@@ -153,14 +155,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   /* --------------------------- BACKEND LOGIN --------------------------- */
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (
+    identifier: string,
+    password: string
+  ): Promise<boolean> => {
     setLoadingAuthState(true);
 
     try {
       const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ identifier, password }),
       });
 
       const data = await res.json();
@@ -204,7 +209,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const res = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName, email, password }),
+        body: JSON.stringify({
+          fullName,
+          email,
+          password,
+          countryCode: _countryCode,
+          phone: _phone,
+        }),
       });
 
       const data = await res.json();
