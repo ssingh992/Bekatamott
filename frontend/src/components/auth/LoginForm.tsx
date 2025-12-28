@@ -1,9 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../ui/Button';
 import { EyeIcon, EyeSlashIcon } from '../icons/GenericIcons';
-import SocialLoginButtons from './SocialLoginButtons';
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
@@ -127,7 +125,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSwitchToFor
           </button>
         </p>
       </form>
-      <SocialLoginButtons onSocialLoginSuccess={onLoginSuccess} />
     </>
   );
 };

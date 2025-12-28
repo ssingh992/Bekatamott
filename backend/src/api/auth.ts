@@ -51,18 +51,23 @@ function createToken(user: any) {
   );
 }
 
+function sanitizeUser(user: any) {
+  const { password, passwordHash, ...safeUser } = user;
+  return safeUser;
+}
+
 /* ---------------------------------------------
    POST /api/auth/register
 ---------------------------------------------- */
 router.post("/register", async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
+    const { fullName, email, password, countryCode, phone } = req.body;
 
     if (!fullName || !email || !password) {
-      return res.status(400).json({ error: "Missing fields" });
+      return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const normalizedEmail = email.toLowerCase();
+    const normalizedEmail = email.toLowerCase().trim();
     const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (existing) {
       return res.status(400).json({ error: "Email already exists" });
@@ -71,21 +76,40 @@ router.post("/register", async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
     const role = normalizedEmail === ADMIN_EMAIL ? "admin" : "user";
 
+    const baseUsername =
+      email?.split("@")[0]?.toLowerCase() ||
+      fullName
+        .toLowerCase()
+        .replace(/\s+/g, "")
+        .replace(/[^a-z0-9]/g, "");
+    const sanitizedUsername = baseUsername || `user${Date.now()}`;
+
+    let usernameCandidate = sanitizedUsername;
+    let suffix = 1;
+    // Ensure username uniqueness for Prisma constraint
+    while (await prisma.user.findUnique({ where: { username: usernameCandidate } })) {
+      usernameCandidate = `${sanitizedUsername}${suffix++}`;
+    }
+
+    const phoneValue = (countryCode || "") + (phone || "");
+
     const user = await prisma.user.create({
       data: {
         id: crypto.randomUUID(),
         fullName,
         email: normalizedEmail,
-        username: email.split("@")[0],
+        username: usernameCandidate,
         role,
-        // Store hashed password in new field
-        // Must add password column in schema if missing
+        countryCode: countryCode ?? null,
+        phone: phoneValue ? phoneValue.replace(/\s+/g, "") : null,
+        // Store hashed password in password columns
         password: hashed as any,
+        passwordHash: hashed as any,
       },
     });
 
     const token = createToken(user);
-    res.json({ token, user });
+    res.json({ token, user: sanitizeUser(user) });
   } catch (error) {
     console.error("REGISTER ERROR:", error);
     res.status(500).json({ error: "Internal error" });
@@ -97,14 +121,27 @@ router.post("/register", async (req, res) => {
 ---------------------------------------------- */
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { identifier, email, password } = req.body;
 
-    const normalizedEmail = email.toLowerCase();
+    const loginIdentifier = (identifier || email || "").trim();
 
-    if (!email || !password)
-      return res.status(400).json({ error: "Missing email or password" });
+    if (!loginIdentifier || !password)
+      return res.status(400).json({ error: "Missing identifier or password" });
 
-    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+    const normalizedEmail = loginIdentifier.includes("@")
+      ? loginIdentifier.toLowerCase()
+      : undefined;
+    const normalizedPhone = loginIdentifier.replace(/\s+/g, "");
+
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          normalizedEmail ? { email: normalizedEmail } : undefined,
+          { username: loginIdentifier.toLowerCase() },
+          { phone: normalizedPhone },
+        ].filter(Boolean) as any,
+      },
+    });
 
     if (!user || !user.password)
       return res.status(401).json({ error: "Invalid credentials" });
@@ -116,7 +153,7 @@ router.post("/login", async (req, res) => {
 
     console.log("LOGIN → token generated:", token.substring(0, 30) + "...");
 
-    res.json({ token, user });
+    res.json({ token, user: sanitizeUser(user) });
   } catch (error) {
     console.error("LOGIN ERROR:", error);
     res.status(500).json({ error: "Internal error" });
@@ -132,7 +169,7 @@ router.get("/me", authMiddleware, async (req: any, res) => {
       where: { id: req.user.id },
     });
 
-    res.json({ user });
+    res.json({ user: user ? sanitizeUser(user) : null });
   } catch (error) {
     console.error("ME ERROR:", error);
     res.status(500).json({ error: "Internal error" });
