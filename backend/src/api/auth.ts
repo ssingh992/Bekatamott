@@ -5,27 +5,57 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../db";
 import { authMiddleware } from "../middleware/auth";
 
-const ADMIN_EMAIL = "bishramekatamandali@gmail.com";
-const ADMIN_PASSWORD = "bishramekatamandali@15Done";
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "bishramekatamandali@gmail.com").toLowerCase().trim();
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "bishramekatamandali@15Done";
+const ADMIN_FULL_NAME = process.env.ADMIN_FULL_NAME || "Bishram Admin";
 
 const router = express.Router();
+
+async function generateUniqueUsername(baseUsername?: string) {
+  const sanitizedUsername =
+    baseUsername?.toLowerCase().replace(/\s+/g, "").replace(/[^a-z0-9]/g, "") ||
+    `user${Date.now()}`;
+
+  let usernameCandidate = sanitizedUsername;
+  let suffix = 1;
+
+  while (await prisma.user.findUnique({ where: { username: usernameCandidate } })) {
+    usernameCandidate = `${sanitizedUsername}${suffix++}`;
+  }
+
+  return usernameCandidate;
+}
 
 async function ensureDefaultAdmin() {
   try {
     const existingAdmin = await prisma.user.findUnique({ where: { email: ADMIN_EMAIL } });
+    const hashed = await bcrypt.hash(ADMIN_PASSWORD, 10);
+
+    const adminUsername = existingAdmin
+      ? existingAdmin.username
+      : await generateUniqueUsername(ADMIN_EMAIL.split("@")[0]);
+
+    await prisma.user.upsert({
+      where: { email: ADMIN_EMAIL },
+      update: {
+        fullName: ADMIN_FULL_NAME,
+        username: adminUsername,
+        role: "admin",
+        password: hashed as any,
+        passwordHash: hashed as any,
+      },
+      create: {
+        id: crypto.randomUUID(),
+        fullName: ADMIN_FULL_NAME,
+        email: ADMIN_EMAIL,
+        username: adminUsername,
+        role: "admin",
+        password: hashed as any,
+        passwordHash: hashed as any,
+      },
+    });
 
     if (!existingAdmin) {
-      const hashed = await bcrypt.hash(ADMIN_PASSWORD, 10);
-      await prisma.user.create({
-        data: {
-          id: crypto.randomUUID(),
-          fullName: "Bishram Admin",
-          email: ADMIN_EMAIL,
-          username: ADMIN_EMAIL.split("@")[0],
-          role: "admin",
-          password: hashed as any,
-        },
-      });
       console.log("✅ Default admin account created for", ADMIN_EMAIL);
     }
   } catch (error) {
@@ -82,14 +112,8 @@ router.post("/register", async (req, res) => {
         .toLowerCase()
         .replace(/\s+/g, "")
         .replace(/[^a-z0-9]/g, "");
-    const sanitizedUsername = baseUsername || `user${Date.now()}`;
 
-    let usernameCandidate = sanitizedUsername;
-    let suffix = 1;
-    // Ensure username uniqueness for Prisma constraint
-    while (await prisma.user.findUnique({ where: { username: usernameCandidate } })) {
-      usernameCandidate = `${sanitizedUsername}${suffix++}`;
-    }
+    const usernameCandidate = await generateUniqueUsername(baseUsername);
 
     const phoneValue = (countryCode || "") + (phone || "");
 
