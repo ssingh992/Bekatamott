@@ -28,7 +28,7 @@ import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
 import { formatDateADBS } from '../dateConverter';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+import { API_BASE_URL } from "../utils/apiConfig";
 
 const ownerId = '0';
 const ownerName = 'Shahid Singh';
