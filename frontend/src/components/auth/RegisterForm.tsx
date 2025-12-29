@@ -439,9 +439,13 @@ import { useAuth } from "../../contexts/AuthContext";
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
+  onRegisterSuccess?: () => void;
 }
 
-const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
+const RegisterForm: React.FC<RegisterFormProps> = ({
+  onSwitchToLogin,
+  onRegisterSuccess,
+}) => {
   const { register } = useAuth();
 
   const [fullName, setFullName] = useState("");
@@ -499,12 +503,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
       return;
     }
 
-    setSuccess("Registration successful! Logging you in...");
+    setSuccess("Registration successful! You're now logged in.");
     setLoading(false);
 
-    setTimeout(() => {
-      onSwitchToLogin();
-    }, 1200);
+    if (onRegisterSuccess) {
+      onRegisterSuccess();
+    }
   };
 
   return (
