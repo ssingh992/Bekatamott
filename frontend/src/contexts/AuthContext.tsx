@@ -15,12 +15,9 @@ import {
   FrontendActivityLog,
   Friendship,
 } from "../types";
+import { API_BASE_URL } from "../utils/apiConfig";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ||
-  "http://localhost:3001/api";
 
 const AUTH_TOKEN_KEY = "bem_auth_token";
 const CURRENT_USER_KEY = "bem_current_user";

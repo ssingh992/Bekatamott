@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChatMessage } from '../../types';
-import { SendIcon, CloseIcon, SparklesIcon, ClearIcon } from '../icons/GenericIcons'; 
+import { API_BASE_URL } from "../../utils/apiConfig";
+import { SendIcon, CloseIcon, SparklesIcon, ClearIcon } from '../icons/GenericIcons';
 
 interface ChatbotPanelProps {
   onClose: () => void;
 }
-
-const API_BASE_URL = 'http://localhost:3001/api';
 
 const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
