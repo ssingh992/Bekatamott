@@ -75,3 +75,7 @@ pm2 start ecosystem.config.js --env development
 ## 4. Application Status
 
 This application is a work in progress. Most features are now integrated with the backend and database. Some social features (friends, groups) are still using frontend-simulated data from local storage for demonstration purposes and will be migrated in the future.
+
+## 5. Repository Branching
+
+All active development has been consolidated into the `main` branch. If you previously worked on a `work` branch, those updates are now merged and the branch has been retired.
